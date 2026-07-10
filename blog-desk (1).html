@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Daily Wire — Content Desk</title>
+<style>
+  :root{
+    --ink:#14151a;
+    --ink-2:#1d1f26;
+    --paper:#ece9e1;
+    --paper-dim:#b9b6ac;
+    --amber:#e8b33d;
+    --teal:#4c7a73;
+    --red:#c1543c;
+    --line:#33353f;
+    --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    --font-sans: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--font-sans);
+    min-height:100vh;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:28px 20px 60px;}
+
+  /* Masthead */
+  .masthead{
+    border-bottom:3px double var(--paper-dim);
+    padding-bottom:14px;
+    margin-bottom:6px;
+  }
+  .masthead .kicker{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--amber);
+    display:flex;
+    justify-content:space-between;
+  }
+  .masthead h1{
+    font-family:var(--font-display);
+    font-size:44px;
+    margin:6px 0 2px;
+    letter-spacing:.01em;
+  }
+  .masthead .sub{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--paper-dim);
+  }
+
+  /* Ticker */
+  .ticker-outer{
+    border-bottom:1px solid var(--line);
+    margin-bottom:22px;
+    overflow:hidden;
+    white-space:nowrap;
+    background:var(--ink-2);
+  }
+  .ticker{
+    display:inline-block;
+    padding:8px 0;
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--teal);
+    animation:scroll 28s linear infinite;
+  }
+  .ticker span{margin-right:36px;}
+  .ticker span b{color:var(--amber);}
+  @keyframes scroll{
+    0%{transform:translateX(0);}
+    100%{transform:translateX(-50%);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .ticker{animation:none;}
+  }
+
+  /* Tabs */
+  .tabs{display:flex;gap:2px;margin-bottom:22px;}
+  .tab{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    padding:10px 16px;
+    background:var(--ink-2);
+    color:var(--paper-dim);
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .tab:hover{color:var(--paper);}
+  .tab.active{
+    background:var(--amber);
+    color:var(--ink);
+    border-color:var(--amber);
+    font-weight:600;
+  }
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  /* Cards */
+  .card{
+    background:var(--ink-2);
+    border:1px solid var(--line);
+    padding:20px;
+    margin-bottom:16px;
+  }
+  .card h2{
+    font-family:var(--font-display);
+    font-size:20px;
+    margin:0 0 14px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  label{
+    display:block;
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--paper-dim);
+    margin-bottom:5px;
+  }
+  input[type=text], input[type=url], textarea, select{
+    width:100%;
+    background:var(--ink);
+    border:1px solid var(--line);
+    color:var(--paper);
+    padding:10px 12px;
+    font-family:var(--font-sans);
+    font-size:14px;
+    margin-bottom:14px;
+  }
+  input:focus, textarea:focus, select:focus{
+    outline:2px solid var(--amber);
+    outline-offset:1px;
+  }
+  textarea{resize:vertical;min-height:70px;}
+  .row{display:flex;gap:10px;}
+  .row > *{flex:1;}
+
+  button{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    background:var(--amber);
+    color:var(--ink);
+    border:none;
+    padding:11px 18px;
+    cursor:pointer;
+    font-weight:700;
+  }
+  button:hover{background:#f2c35a;}
+  button:disabled{background:var(--paper-dim);cursor:not-allowed;}
+  button.ghost{
+    background:transparent;
+    color:var(--paper-dim);
+    border:1px solid var(--line);
+    font-weight:400;
+  }
+  button.ghost:hover{color:var(--red);border-color:var(--red);}
+
+  /* Competitor list */
+  .comp-list{list-style:none;padding:0;margin:0;}
+  .comp-list li{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .comp-list li:last-child{border-bottom:none;}
+  .comp-list .name{font-weight:600;}
+  .comp-list .url{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--teal);
+    display:block;
+  }
+  .empty{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--paper-dim);
+    padding:14px 0;
+  }
+
+  /* Generate panel */
+  .status{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--amber);
+    margin:10px 0;
+    min-height:16px;
+  }
+  .draft{
+    background:var(--paper);
+    color:var(--ink);
+    padding:28px 30px;
+    font-family:var(--font-display);
+    line-height:1.65;
+    white-space:pre-wrap;
+  }
+  .draft h3{margin-top:0;}
+  .draft-meta{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--ink-2);
+    border-bottom:1px dashed var(--paper-dim);
+    padding-bottom:10px;
+    margin-bottom:16px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+  }
+  .actions{display:flex;gap:10px;margin-top:14px;}
+
+  /* History */
+  .history-item{
+    border-bottom:1px solid var(--line);
+    padding:14px 0;
+    cursor:pointer;
+  }
+  .history-item:hover .h-title{color:var(--amber);}
+  .h-date{font-family:var(--font-mono);font-size:11px;color:var(--paper-dim);}
+  .h-title{font-family:var(--font-display);font-size:17px;margin:3px 0;}
+  .h-topic{font-size:12px;color:var(--teal);}
+
+  .spinner{
+    display:inline-block;width:11px;height:11px;
+    border:2px solid var(--paper-dim);
+    border-top-color:var(--amber);
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    margin-right:6px;
+    vertical-align:middle;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="kicker"><span>Content Desk Edition</span><span id="today"></span></div>
+    <h1>The Daily Wire</h1>
+    <div class="sub">Watching your competitors so you don't have to — one draft a day.</div>
+  </div>
+
+  <div class="ticker-outer">
+    <div class="ticker" id="ticker"><span>Add competitors in the Sources tab to populate the wire &nbsp;·&nbsp;</span></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="sources">Sources</div>
+    <div class="tab" data-tab="generate">Generate</div>
+    <div class="tab" data-tab="history">History</div>
+  </div>
+
+  <!-- SOURCES -->
+  <div class="panel active" id="panel-sources">
+    <div class="card">
+      <h2>Your Business</h2>
+      <label for="biz-name">Business name</label>
+      <input type="text" id="biz-name" placeholder="e.g. Riverside Coffee Roasters">
+      <label for="biz-url">Website</label>
+      <input type="url" id="biz-url" placeholder="https://yourbusiness.com">
+      <label for="biz-author">Default byline / author name</label>
+      <input type="text" id="biz-author" placeholder="e.g. Jamie Rivera">
+      <label for="biz-niche">Industry / niche (helps the writer stay on-brand)</label>
+      <input type="text" id="biz-niche" placeholder="e.g. specialty coffee roasting, B2B SaaS for dentists">
+      <label for="biz-tone">Voice &amp; tone notes (optional)</label>
+      <textarea id="biz-tone" placeholder="e.g. warm and conversational, no jargon, always include a call to action"></textarea>
+      <button id="save-biz">Save business</button>
+      <span class="status" id="biz-status"></span>
+    </div>
+
+    <div class="card">
+      <h2>Competitors <span style="font-family:var(--font-mono);font-size:11px;color:var(--paper-dim);">— add as many as you spot</span></h2>
+      <div class="row">
+        <div>
+          <label for="comp-name">Name</label>
+          <input type="text" id="comp-name" placeholder="e.g. Acme Roasters">
+        </div>
+        <div>
+          <label for="comp-url">Website</label>
+          <input type="url" id="comp-url" placeholder="https://competitor.com">
+        </div>
+      </div>
+      <button id="add-comp">+ Add competitor</button>
+      <span class="status" id="comp-status"></span>
+      <ul class="comp-list" id="comp-list" style="margin-top:16px;"></ul>
+    </div>
+  </div>
+
+  <!-- GENERATE -->
+  <div class="panel" id="panel-generate">
+    <div class="card">
+      <h2>Today's Assignment</h2>
+      <label for="gen-angle">Optional steer (leave blank and the desk will find a gap itself)</label>
+      <input type="text" id="gen-angle" placeholder="e.g. focus on something timely, or write about sustainability">
+      <button id="run-gen">Research &amp; draft today's post</button>
+      <div class="status" id="gen-status"></div>
+    </div>
+    <div class="card" id="draft-card" style="display:none;">
+      <div id="draft-output"></div>
+      <div class="actions">
+        <button class="ghost" id="copy-draft">Copy text</button>
+        <button class="ghost" id="regen-draft">Regenerate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="panel" id="panel-history">
+    <div class="card">
+      <h2>Past Drafts</h2>
+      <div id="history-list"><div class="empty">No drafts yet — generate your first one.</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+document.getElementById('today').textContent = new Date().toLocaleDateString('en-US',{weekday:'long', month:'long', day:'numeric', year:'numeric'});
+
+// ---------- Tabs ----------
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.tab).classList.add('active');
+    if(t.dataset.tab==='history') renderHistory();
+  });
+});
+
+// ---------- State ----------
+let business = {name:'', url:'', author:'', niche:'', tone:''};
+let competitors = [];
+let drafts = [];
+
+async function loadAll(){
+  try{
+    const b = await window.storage.get('business', false);
+    if(b) business = JSON.parse(b.value);
+  }catch(e){}
+  try{
+    const c = await window.storage.get('competitors', false);
+    if(c) competitors = JSON.parse(c.value);
+  }catch(e){}
+  try{
+    const d = await window.storage.get('drafts', false);
+    if(d) drafts = JSON.parse(d.value);
+  }catch(e){}
+  hydrateForm();
+  renderCompetitors();
+  renderTicker();
+}
+
+function hydrateForm(){
+  $('#biz-name').value = business.name||'';
+  $('#biz-url').value = business.url||'';
+  $('#biz-author').value = business.author||'';
+  $('#biz-niche').value = business.niche||'';
+  $('#biz-tone').value = business.tone||'';
+}
+
+async function saveBusiness(){
+  business = {
+    name: $('#biz-name').value.trim(),
+    url: $('#biz-url').value.trim(),
+    author: $('#biz-author').value.trim(),
+    niche: $('#biz-niche').value.trim(),
+    tone: $('#biz-tone').value.trim()
+  };
+  const st = $('#biz-status');
+  try{
+    await window.storage.set('business', JSON.stringify(business), false);
+    st.textContent = 'Saved.';
+    setTimeout(()=>st.textContent='',1800);
+  }catch(e){
+    st.textContent = 'Could not save — try again.';
+  }
+}
+$('#save-biz').addEventListener('click', saveBusiness);
+
+async function addCompetitor(){
+  const name = $('#comp-name').value.trim();
+  const url = $('#comp-url').value.trim();
+  const st = $('#comp-status');
+  if(!name || !url){
+    st.textContent = 'Add both a name and a website.';
+    return;
+  }
+  competitors.push({id: 'c'+Date.now(), name, url});
+  try{
+    await window.storage.set('competitors', JSON.stringify(competitors), false);
+    $('#comp-name').value=''; $('#comp-url').value='';
+    st.textContent = 'Added.';
+    setTimeout(()=>st.textContent='',1500);
+    renderCompetitors();
+    renderTicker();
+  }catch(e){
+    st.textContent = 'Could not save — try again.';
+    competitors.pop();
+  }
+}
+$('#add-comp').addEventListener('click', addCompetitor);
+
+async function removeCompetitor(id){
+  competitors = competitors.filter(c=>c.id!==id);
+  try{
+    await window.storage.set('competitors', JSON.stringify(competitors), false);
+  }catch(e){}
+  renderCompetitors();
+  renderTicker();
+}
+
+function renderCompetitors(){
+  const list = $('#comp-list');
+  if(!competitors.length){
+    list.innerHTML = '<div class="empty">No competitors tracked yet.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  competitors.forEach(c=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<div><span class="name">${escapeHtml(c.name)}</span><span class="url">${escapeHtml(c.url)}</span></div>`;
+    const btn = document.createElement('button');
+    btn.className='ghost'; btn.textContent='Remove'; btn.style.padding='6px 10px';
+    btn.addEventListener('click', ()=>removeCompetitor(c.id));
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+}
+
+function renderTicker(){
+  const t = $('#ticker');
+  if(!competitors.length){
+    t.innerHTML = '<span>Add competitors in the Sources tab to populate the wire &nbsp;·&nbsp;</span>';
+    return;
+  }
+  const items = competitors.map(c=>`<span>WATCHING &nbsp;<b>${escapeHtml(c.name)}</b> &nbsp;— ${escapeHtml(c.url)} &nbsp;·&nbsp;</span>`).join('');
+  t.innerHTML = items + items; // doubled for seamless scroll
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// ---------- Generate ----------
+async function runGenerate(){
+  const st = $('#gen-status');
+  const btn = $('#run-gen');
+  if(!business.url){
+    st.textContent = 'Add your business website in Sources first.';
+    return;
+  }
+  btn.disabled = true;
+  st.innerHTML = '<span class="spinner"></span> Checking your site and competitor sites…';
+  $('#draft-card').style.display='none';
+
+  const angle = $('#gen-angle').value.trim();
+  const compList = competitors.map(c=>`- ${c.name}: ${c.url}`).join('\n') || '(none tracked yet)';
+
+  const sysPrompt = `You are the lead content strategist at a small content desk. You research a client's own website and their competitors' websites using web search, then propose ONE strong blog topic that fills a genuine content gap or rides a timely angle, and write a complete, ready-to-review draft blog post in the client's voice.
+
+Client: ${business.name || 'the client'}
+Website: ${business.url}
+Industry/niche: ${business.niche || 'not specified'}
+Voice/tone notes: ${business.tone || 'professional but approachable'}
+
+Competitors to check:
+${compList}
+${angle ? `\nThe client has requested a steer for today: ${angle}` : ''}
+
+Process:
+1. Briefly check the client's own site to understand what they already cover and how they sound.
+2. Check each competitor site for recent blog content/topics.
+3. Identify one topic the client hasn't covered but a competitor has, or a gap none of them cover well, or a timely angle worth writing about today.
+4. Write a complete blog post draft (roughly 500-700 words) in the client's voice on that topic.
+
+Output format — respond with EXACTLY this structure and nothing else:
+TITLE: <blog post title>
+SLUG: <url-safe slug, lowercase, hyphens, no punctuation>
+AUTHOR: <${business.author || 'author name — invent a plausible one only if none was given'}>
+TOPIC: <one line describing the angle/topic chosen>
+RATIONALE: <1-2 sentences on why this topic, referencing what you found>
+EXCERPT: <one or two sentence summary, 25-40 words, suitable as a preview/meta description>
+---
+<the full blog post body in markdown, no title heading repeated>`;
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{role:"user", content: sysPrompt}],
+        tools: [{type:"web_search_20250305", name:"web_search"}]
+      })
+    });
+    const data = await response.json();
+    const text = (data.content || []).filter(b=>b.type==='text').map(b=>b.text).join('\n').trim();
+
+    if(!text){
+      st.textContent = 'The desk came back empty — try again.';
+      btn.disabled = false;
+      return;
+    }
+
+    const parsed = parseDraft(text);
+    showDraft(parsed);
+
+    drafts.unshift({
+      id: 'd'+Date.now(),
+      date: new Date().toISOString(),
+      title: parsed.title,
+      slug: parsed.slug,
+      author: parsed.author,
+      topic: parsed.topic,
+      rationale: parsed.rationale,
+      excerpt: parsed.excerpt,
+      body: parsed.body
+    });
+    try{
+      await window.storage.set('drafts', JSON.stringify(drafts), false);
+    }catch(e){}
+
+    st.textContent = 'Draft ready.';
+  }catch(e){
+    st.textContent = 'Something went wrong reaching the desk — try again.';
+  }
+  btn.disabled = false;
+}
+
+function slugify(s){
+  return s.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g,'')
+    .replace(/\s+/g,'-')
+    .replace(/-+/g,'-')
+    .replace(/^-|-$/g,'');
+}
+
+function parseDraft(text){
+  let title='Untitled', slug='', author='', topic='', rationale='', excerpt='', body=text;
+  const titleM = text.match(/TITLE:\s*(.*)/i);
+  const slugM = text.match(/SLUG:\s*(.*)/i);
+  const authorM = text.match(/AUTHOR:\s*(.*)/i);
+  const topicM = text.match(/TOPIC:\s*(.*)/i);
+  const ratM = text.match(/RATIONALE:\s*(.*)/i);
+  const excM = text.match(/EXCERPT:\s*(.*)/i);
+  if(titleM) title = titleM[1].trim();
+  if(slugM) slug = slugM[1].trim();
+  if(authorM) author = authorM[1].trim();
+  if(topicM) topic = topicM[1].trim();
+  if(ratM) rationale = ratM[1].trim();
+  if(excM) excerpt = excM[1].trim();
+  if(!slug) slug = slugify(title);
+  if(!author) author = business.author || 'Unattributed';
+  const split = text.split(/\n---\n/);
+  if(split.length>1) body = split.slice(1).join('\n---\n').trim();
+  return {title, slug, author, topic, rationale, excerpt, body};
+}
+
+function showDraft(d){
+  $('#draft-card').style.display='block';
+  $('#draft-output').innerHTML = `
+    <div class="draft">
+      <div class="draft-meta">
+        Slug: /${escapeHtml(d.slug)} &nbsp;·&nbsp; By ${escapeHtml(d.author)}<br>
+        Topic: ${escapeHtml(d.topic)} &nbsp;·&nbsp; ${escapeHtml(d.rationale)}
+      </div>
+      <h3>${escapeHtml(d.title)}</h3>
+      <p style="font-style:italic;color:var(--ink-2);border-left:3px solid var(--amber);padding-left:12px;margin:0 0 18px;">${escapeHtml(d.excerpt)}</p>
+      <div id="draft-body-text">${escapeHtml(d.body)}</div>
+    </div>`;
+  $('#draft-output').dataset.full =
+`Title: ${d.title}
+Slug: ${d.slug}
+Author: ${d.author}
+Excerpt: ${d.excerpt}
+
+${d.body}`;
+}
+
+$('#run-gen').addEventListener('click', runGenerate);
+$('#regen-draft').addEventListener('click', runGenerate);
+$('#copy-draft').addEventListener('click', ()=>{
+  const full = $('#draft-output').dataset.full || '';
+  navigator.clipboard.writeText(full).then(()=>{
+    const b = $('#copy-draft');
+    const old = b.textContent;
+    b.textContent = 'Copied';
+    setTimeout(()=>b.textContent=old, 1400);
+  });
+});
+
+// ---------- History ----------
+function renderHistory(){
+  const el = $('#history-list');
+  if(!drafts.length){
+    el.innerHTML = '<div class="empty">No drafts yet — generate your first one.</div>';
+    return;
+  }
+  el.innerHTML='';
+  drafts.forEach(d=>{
+    const item = document.createElement('div');
+    item.className='history-item';
+    const dt = new Date(d.date);
+    item.innerHTML = `
+      <div class="h-date">${dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} &nbsp;·&nbsp; ${escapeHtml(d.author||'')}</div>
+      <div class="h-title">${escapeHtml(d.title)}</div>
+      <div class="h-topic">/${escapeHtml(d.slug||slugify(d.title))} &nbsp;·&nbsp; ${escapeHtml(d.topic)}</div>`;
+    item.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+      document.querySelector('.tab[data-tab="generate"]').classList.add('active');
+      document.getElementById('panel-generate').classList.add('active');
+      showDraft({title:d.title, slug:d.slug||slugify(d.title), author:d.author||'', topic:d.topic, rationale:d.rationale, excerpt:d.excerpt||'', body:d.body});
+      $('#draft-card').scrollIntoView({behavior:'smooth'});
+    });
+    el.appendChild(item);
+  });
+}
+
+loadAll();
+</script>
+</body>
+</html>
